@@ -76,6 +76,7 @@ sudo apt-get install -y i3
 echo "Installing cahhome shell environment."
 cd ~ && git clone --recursive git@bitbucket.org:cheilman/cahhome.git .cahhome
 cd ~/.cahhome/modules && git clone git@bitbucket.org:cheilman/cahhome_atom.git atom
+cd ~/.cahhome/modules/antigen/antigen && git submodule update
 
 cd ~ && ./.cahhome/install
 
@@ -83,7 +84,7 @@ cd ~ && ./.cahhome/install
 # Switch to zsh
 #
 echo "Changing shell to zsh"
-zsh_bin=`cat /etc/shells | grep zsh`
+zsh_bin=`cat /etc/shells | grep zsh | head -1`
 if [ -n "$zsh_bin" ]; then
 	sudo chsh -s "$zsh_bin" $(whoami)
 else
