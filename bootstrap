@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+# Install all the needed things for our system
+#
+
+if [ "$(id -u)" != "0" ]; then
+	echo "This script must be run by root." 1&>2
+	exit 1
+fi
+
+#
+# First install the bare necessities to get things started
+#
+apt-get install -y apt-file aptitude curl git vim zsh
+
+#
+# Then, add a bunch of PPAs
+#
+
+# Chrome
+curl https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+
+# Atom
+add-apt-repository ppa:webupd8team/atom
+
+# Oracle Java
+add-apt-repository ppa:webupd8team/java
+
+# Git
+add-apt-repository ppa:git-core/ppa
+
+#
+# Do an update and upgrade
+#
+aptitude update && aptitude upgrade
+
+#
+# Here's the big chuck of packages
+#
+aptitude install -y acpi atom feh git git-extras google-chrome-stable gpointing-device-settings gtk-chtheme htop ibam locate lxappearance numlockx oracle-java8-installer oracle-java8-set-default qt4-qtconfig scrot texlive-full traceroute wget xautolock xbacklight zsh
+
+#
+# Some weird stuff to get i3 set up
+#
+echo "deb http://debian.sur5r.net/i3/ $(lsb_release -c -s) universe" >> /etc/apt/sources.list.d/i3.list
+apt-get update
+apt-get --allow-unauthenticated install sur5r-keyring
+apt-get update
+apt-get install -y i3
+
+#
+# Download and install our shell
+#
+cd ~ && git clone --recursive git@bitbucket.org:cheilman/cahhome.git .cahhome
+cd ~/.cahhome/modules && git clone git@bitbucket.org:cheilman/cahhome_atom.git atom
+
+cd ~ && ./.cahhome/install
+
+#
+# Switch to zsh
+#
+zsh_bin=`cat /etc/shells | grep zsh`
+if [ -n "$zsh_bin" ]; then
+	chsh -s "$zsh_bin" "$SUDO_USER"
+fi
+
+#
+# Do another update and upgrade
+#
+aptitude update && aptitude upgrade
+
+#
+# What other stuff needs to happen?
+#
+
