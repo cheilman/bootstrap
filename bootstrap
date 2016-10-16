@@ -98,6 +98,8 @@ echo "Running a final update/upgrade."
 sudo aptitude update && sudo aptitude upgrade
 
 #
-# What other stuff needs to happen?
+# Kick off an indexing
 #
+echo "Indexing home directory."
+~/bin/update-home-database
 
