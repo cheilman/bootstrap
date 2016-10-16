@@ -4,10 +4,10 @@
 #
 
 if [ "$(id -u)" == "0" ]; then
-	echo "This file must NOT be run by root." 1&>2
+	echo "This file must NOT be run by root." 1>&2
 	exit 1
 else
-	echo "This script will ask for your sudo password now." 1&>2
+	echo "This script will ask for your sudo password now (and probably later)." 1>&2
 	sudo whoami
 fi
 
