@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# Install enough to start the bootstrap process
+#
+
+if [ "$(id -u)" != "0" ]; then
+	echo "This script must be run as root." 1>&2
+	exit 1
+fi
+
+# Need a git client
+apt-get install git
+ext=$?
+if [ $ext -ne 0 ]; then
+	exit $ext
+fi
+
+# Grab the bootstrap repo
+mkdir -p ~/prj || :
+cd ~/prj && git clone git@bitbucket.org:cheilman/bootstrap.git bootstrap
+ext=$?
+if [ $ext -ne 0 ]; then
+	exit $ext
+fi
+
+# Start bootstrap process
+cd ~/prj/bootstrap && ./bootstrap
+
+
