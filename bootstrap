@@ -3,46 +3,66 @@
 # Install all the needed things for our system
 #
 
-if [ "$(id -u)" != "0" ]; then
-	echo "This script must be run by root." 1&>2
+if [ "$(id -u)" == "0" ]; then
+	echo "This file must NOT be run by root." 1&>2
 	exit 1
+else
+	echo "This script will ask for your sudo password now." 1&>2
+	sudo whoami
 fi
 
 #
 # First install the bare necessities to get things started
 #
-apt-get install -y apt-file aptitude curl git vim zsh
+echo "Installing base requirements"
+
+sudo apt-get install -y apt-file aptitude curl git openssh vim zsh
+
+#
+# Set up our SSH key
+#
+if [ -f ~/.ssh/id_rsa.pub ]; then
+	echo "Setting up SSH key."
+	ssh-keygen
+	echo "Here is your public ssh key: "
+	cat ~/.ssh/id_rsa.pub
+	read -p "Press [ENTER] when key has been uploaded to bitbucket."
+fi
 
 #
 # Then, add a bunch of PPAs
 #
+echo "Adding PPAs"
 
 # Chrome
 curl https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
 echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
 
 # Atom
-add-apt-repository ppa:webupd8team/atom
+add-apt-repository -y ppa:webupd8team/atom
 
 # Oracle Java
-add-apt-repository ppa:webupd8team/java
+add-apt-repository -y ppa:webupd8team/java
 
 # Git
-add-apt-repository ppa:git-core/ppa
+add-apt-repository -y ppa:git-core/ppa
 
 #
 # Do an update and upgrade
 #
-aptitude update && aptitude upgrade
+echo "Running an update/upgrade."
+aptitude update && aptitude upgrade -y
 
 #
 # Here's the big chuck of packages
 #
+echo "Installing the majority of the packages."
 aptitude install -y acpi atom feh git git-extras google-chrome-stable gpointing-device-settings gtk-chtheme htop ibam locate lxappearance numlockx oracle-java8-installer oracle-java8-set-default qt4-qtconfig scrot texlive-full traceroute wget xautolock xbacklight zsh
 
 #
 # Some weird stuff to get i3 set up
 #
+echo "Trying to get i3 up and running."
 echo "deb http://debian.sur5r.net/i3/ $(lsb_release -c -s) universe" >> /etc/apt/sources.list.d/i3.list
 apt-get update
 apt-get --allow-unauthenticated install sur5r-keyring
@@ -52,6 +72,7 @@ apt-get install -y i3
 #
 # Download and install our shell
 #
+echo "Installing cahhome shell environment."
 cd ~ && git clone --recursive git@bitbucket.org:cheilman/cahhome.git .cahhome
 cd ~/.cahhome/modules && git clone git@bitbucket.org:cheilman/cahhome_atom.git atom
 
@@ -60,14 +81,18 @@ cd ~ && ./.cahhome/install
 #
 # Switch to zsh
 #
+echo "Changing shell to zsh"
 zsh_bin=`cat /etc/shells | grep zsh`
 if [ -n "$zsh_bin" ]; then
 	chsh -s "$zsh_bin" "$SUDO_USER"
+else
+	echo "!!! ZSH NOT INSTALLED !!!"
 fi
 
 #
 # Do another update and upgrade
 #
+echo "Running a final update/upgrade."
 aptitude update && aptitude upgrade
 
 #
