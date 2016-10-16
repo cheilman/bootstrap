@@ -21,7 +21,7 @@ sudo apt-get install -y apt-file aptitude curl git openssh vim zsh
 #
 # Set up our SSH key
 #
-if [ -f ~/.ssh/id_rsa.pub ]; then
+if [ ! -f ~/.ssh/id_rsa.pub ]; then
 	echo "Setting up SSH key."
 	ssh-keygen
 fi
