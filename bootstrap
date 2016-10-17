@@ -81,6 +81,11 @@ cd ~/.cahhome/modules/antigen/antigen && git submodule update
 cd ~ && ./.cahhome/install
 
 #
+# Install py3status
+#
+cd ~/.i3/dev-py3status && sudo pypi-install py3status
+
+#
 # Switch to zsh
 #
 echo "Changing shell to zsh"
