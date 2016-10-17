@@ -58,7 +58,7 @@ sudo aptitude update && sudo aptitude upgrade -y
 # Here's the big chuck of packages
 #
 echo "Installing the majority of the packages."
-sudo aptitude install -y acpi atom feh git git-extras google-chrome-stable gpointing-device-settings gtk-chtheme htop ibam locate lxappearance numlockx oracle-java8-installer oracle-java8-set-default qt4-qtconfig scrot texlive-full traceroute wget xautolock xbacklight zsh
+sudo aptitude install -y acpi atom feh git git-extras google-chrome-stable gpointing-device-settings gtk-chtheme htop ibam locate lxappearance numlockx oracle-java8-installer oracle-java8-set-default python-stdeb qt4-qtconfig scrot texlive-full traceroute wget xautolock xbacklight zsh
 
 #
 # Some weird stuff to get i3 set up
