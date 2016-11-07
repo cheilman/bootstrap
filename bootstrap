@@ -48,6 +48,10 @@ sudo add-apt-repository -y ppa:webupd8team/java
 # Git
 sudo add-apt-repository -y ppa:git-core/ppa
 
+# Docker
+sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+echo "deb https://apt.dockerproject.org/repo ubuntu-`lsb_release -cs` main" | sudo tee /etc/apt/sources.list.d/docker.list
+
 #
 # Do an update and upgrade
 #
@@ -58,7 +62,7 @@ sudo aptitude update && sudo aptitude upgrade -y
 # Here's the big chuck of packages
 #
 echo "Installing the majority of the packages."
-sudo aptitude install -y acpi atom feh git git-extras google-chrome-stable gpointing-device-settings gtk-chtheme htop ibam locate lxappearance numlockx oracle-java8-installer oracle-java8-set-default python-stdeb qt4-qtconfig scrot texlive-full traceroute wget xautolock xbacklight zsh
+sudo aptitude install -y acpi apt-transport-https atom ca-certificates docker-engine feh git git-extras google-chrome-stable gpointing-device-settings gtk-chtheme htop ibam locate lxappearance numlockx oracle-java8-installer oracle-java8-set-default python-stdeb qt4-qtconfig scrot texlive-full traceroute wget xautolock xbacklight zsh
 
 echo "Attempting to install audio utilities, not a big deal if this fails."
 sudo aptitude install -y pulseaudio-utils || :
@@ -110,4 +114,25 @@ sudo aptitude update && sudo aptitude upgrade
 #
 echo "Indexing home directory."
 ~/bin/update-home-database
+
+#
+# Confgure docker service
+#
+NEW_DOCKER_OPTS='--dns 8.8.8.8 --dns 8.8.4.4 --dns 10.4.4.10 --dns-search amazon.com --bip=240.10.10.1/16'
+echo DOCKER_OPTS=\"$NEW_DOCKER_OPTS\" | sudo tee -a /etc/default/docker
+mkdir -p /etc/systemd/system/docker.service.d
+cat << EOF | sudo tee /etc/systemd/system/docker.service.d/amazon-ip.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd -H fd:// $NEW_DOCKER_OPTS
+EOF
+sudo systemctl daemon-reload
+sudo groupadd docker || :
+sudo usermod -aG docker $USER
+sudo systemctl enable docker
+
+#
+# Start docker service
+# 
+sudo systemctl restart docker
 
