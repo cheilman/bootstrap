@@ -208,3 +208,9 @@ sudo systemctl restart docker
     go get github.com/crosbymichael/ip-addr
 )
 
+#
+# Install things through pip
+#
+
+sudo -H pip install howdoi
+
