@@ -180,7 +180,7 @@ echo "Indexing home directory."
 #
 # Confgure docker service
 #
-NEW_DOCKER_OPTS='--dns 8.8.8.8 --dns 8.8.4.4 --dns 10.4.4.10 --dns-search amazon.com --bip=240.10.10.1/16'
+NEW_DOCKER_OPTS='--dns 10.43.23.72 --dns 10.43.21.186 --dns 10.4.4.10 --dns 8.8.8.8 --dns 8.8.8.4 --dns-search amazon.com --bip=240.10.10.1/16'
 echo DOCKER_OPTS=\"$NEW_DOCKER_OPTS\" | sudo tee -a /etc/default/docker
 mkdir -p /etc/systemd/system/docker.service.d
 cat << EOF | sudo tee /etc/systemd/system/docker.service.d/amazon-ip.conf
