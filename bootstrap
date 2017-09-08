@@ -119,6 +119,7 @@ sudo aptitude install -y \
         qt4-qtconfig \
         screen \
         scrot \
+        taskwarrior \
         texlive-full \
         tmux \
         traceroute \
