@@ -1,0 +1,27 @@
+Set-StartScreenOptions -enableBootToDesktop 
+
+Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowProtectedOSFiles -EnableShowFileExtensions -DisableOpenFileExplorerToQuickAccess -DisableShowRecentFilesInQuickAccess -DisableShowFrequentFoldersInQuickAccess
+
+Set-TaskbarOptions -AlwaysShowIconsOff -Combine Always
+
+Disable-GameBarTips
+
+Disable-BingSearch
+
+Enable-MicrosoftUpdate
+
+Enable-UAC
+
+Install-WindowsUpdate -acceptEula 
+
+
+cinst googlechrome
+cinst putty.install
+cinst procexp
+cinst windirstat
+cinst golang
+cinst steam
+cinst docker
+cinst leagueoflegends
+
+

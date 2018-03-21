@@ -1,2 +1,12 @@
-# bootstrap
-Install some various systems.
+# Bootstrap
+
+Automate setup of new systems.
+
+If you hate security, try running `curl https://bitbucket.org/cheilman/bootstrap/raw/master/bootstrap | sudo /bin/bash -`.
+
+
+TODO:
+- [ ] Add thefuck (https://github.com/nvbn/thefuck)
+- [ ] Add vis (https://github.com/dpayne/cli-visualizer)
+
+>>>>>>> bb

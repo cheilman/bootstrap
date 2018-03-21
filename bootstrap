@@ -1,0 +1,274 @@
+#!/bin/bash
+#
+# Install all the needed things for our system
+#
+
+#
+# Figure out if we're doing a server/laptop install, and if we want tex
+#
+
+isLaptop=0
+installTex=0
+
+while [[ $# -gt 1 ]]; do
+    key="$1"
+    case $key in
+        -l|--laptop)
+            isLaptop=1
+            ;;
+        -t|--tex|--latex)
+            installTex=1
+            ;;
+    esac
+    
+    shift
+done
+
+echo -n "Installing "
+if [ $isLaptop -eq 1 ]; then
+    echo -n "a LAPTOP/INTERACTIVE system"
+else
+    echo -n "a SERVER system"
+fi
+
+if [ $installTex -eq 1 ]; then
+    echo -n " with Tex/Latex support"
+fi
+
+echo "."
+
+#
+# Need root access
+#
+
+if [ "$(id -u)" == "0" ]; then
+	echo "This file must NOT be run by root." 1>&2
+	exit 1
+else
+	echo "This script will ask for your sudo password now (and probably later)." 1>&2
+	sudo whoami
+fi
+
+#
+# First install the bare necessities to get things started
+#
+echo "Installing base requirements"
+
+sudo apt-get install -y apt-file aptitude curl git openssh-client vim zsh
+
+#
+# Set up our SSH key
+#
+if [ ! -f ~/.ssh/id_rsa.pub ]; then
+	echo "Setting up SSH key."
+	ssh-keygen
+fi
+
+echo "Here is your public ssh key: "
+cat ~/.ssh/id_rsa.pub
+read -p "Press [ENTER] when key has been uploaded to bitbucket."
+
+#
+# Then, add a bunch of PPAs
+#
+echo "Adding PPAs"
+
+# Chrome
+curl https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+
+# Atom
+sudo add-apt-repository -y ppa:webupd8team/atom
+
+# Wine
+sudo add-apt-repository -y ppa:ubuntu-wine/ppa
+
+# Wireshark (just the repo, don't install it yet)
+sudo apt-add-repository ppa:wireshark-dev/stable
+
+# Oracle Java
+sudo add-apt-repository -y ppa:webupd8team/java
+
+# Git
+sudo add-apt-repository -y ppa:git-core/ppa
+
+# Docker
+sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+echo "deb https://apt.dockerproject.org/repo ubuntu-`lsb_release -cs` main" | sudo tee /etc/apt/sources.list.d/docker.list
+
+# Asciinema
+sudo apt-add-repository ppa:zanchey/asciinema
+
+# TexLive (latex)
+sudo add-apt-repository ppa:jonathonf/texlive-2017
+
+#
+# Do an update and upgrade
+#
+echo "Running an update/upgrade."
+sudo aptitude update && sudo aptitude upgrade -y
+
+#
+# Here's the big chuck of packages
+#
+echo "Installing the majority of the CLI/Serve/Backend packages."
+sudo aptitude install -y \
+        acpi \
+        asciinema \
+        aspell \
+        apt-transport-https \
+        ansiweather \
+        antiword \
+        build-essential \
+        bzip2 \
+        ca-certificates \
+        datamash \
+        docker-engine \
+        entr \
+        fortune-mod \
+        git \
+        git-extras \
+        gpointing-device-settings \
+        gtk-chtheme \
+        htop \
+        inotify-tools \
+        inxi \
+        locate \
+        lynx \
+        openjdk-8-jre \
+        oracle-java8-installer \
+        oracle-java8-set-default \
+        pandoc \
+        python \
+        python3 \
+        python3-dev \
+        python3-pip \
+        python-setuptools \
+        python-stdeb \
+        silversearcher-ag \
+        taskwarrior \
+        tmux \
+        traceroute \
+        vim \
+        wget \
+        xindy \
+        zsh
+
+if [ $isLaptop -eq 1 ]; then
+    echo "Installing laptop-focused packages."
+    sudo aptitude install -y \
+            atom \
+            feh \
+            gimp \
+            google-chrome-stable \
+            guake \
+            ibam \
+            lxappearance \
+            numlockx \
+            qt4-qtconfig \
+            scrot \
+            wine \
+            xautolock \
+            xbacklight \
+            xclip \
+            xdot
+
+    echo "Attempting to install audio utilities, not a big deal if this fails."
+    sudo aptitude install -y pulseaudio-utils || :
+fi
+
+if [ $installTex -eq 1 ]; then
+    echo "Attempting to install texlive, not a big deal if this fails.  And you may not even want this."
+    sudo aptitude install -y texlive-full || :
+fi
+
+if [ $isLaptop -eq 1 ]; then
+    #
+    # Some weird stuff to get i3 set up
+    #
+    echo "Trying to get i3 up and running."
+    sudo sh -c 'echo "deb http://debian.sur5r.net/i3/ $(lsb_release -c -s) universe" >> /etc/apt/sources.list.d/i3.list'
+    sudo apt-get update
+    sudo apt-get --allow-unauthenticated install sur5r-keyring
+    sudo apt-get update
+    sudo apt-get install -y \
+            i3 \
+            suckless-tools
+fi
+
+#
+# Download and install our shell
+#
+echo "Installing cahhome shell environment."
+cd ~ && git clone --recursive git@bitbucket.org:cheilman/cahhome.git .cahhome
+cd ~/.cahhome/modules && git clone git@bitbucket.org:cheilman/cahhome_atom.git atom
+
+cd ~ && ./.cahhome/install
+
+if [ $isLaptop -eq 1 ]; then
+    #
+    # Install py3status
+    #
+    cd ~/.i3/dev-py3status && sudo pypi-install py3status
+fi
+
+#
+# Switch to zsh
+#
+echo "Changing shell to zsh"
+zsh_bin=`cat /etc/shells | grep zsh | head -1`
+if [ -n "$zsh_bin" ]; then
+	sudo chsh -s "$zsh_bin" $(whoami)
+else
+	echo "!!! ZSH NOT INSTALLED !!!"
+fi
+
+#
+# Do another update and upgrade
+#
+echo "Running a final update/upgrade."
+sudo aptitude update && sudo aptitude upgrade
+
+#
+# Kick off an indexing
+#
+echo "Indexing home directory."
+~/bin/cahhome-update-database
+
+#
+# Confgure docker service
+#
+NEW_DOCKER_OPTS='--dns 10.43.23.72 --dns 10.43.21.186 --dns 10.4.4.10 --dns 8.8.8.8 --dns 8.8.8.4 --dns-search amazon.com --bip=240.10.10.1/16'
+echo DOCKER_OPTS=\"$NEW_DOCKER_OPTS\" | sudo tee -a /etc/default/docker
+mkdir -p /etc/systemd/system/docker.service.d
+cat << EOF | sudo tee /etc/systemd/system/docker.service.d/amazon-ip.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd -H fd:// $NEW_DOCKER_OPTS
+EOF
+sudo systemctl daemon-reload
+sudo groupadd docker || :
+sudo usermod -aG docker $USER
+sudo systemctl enable docker
+
+#
+# Start docker service
+# 
+sudo systemctl restart docker
+
+#
+# Install a bunch of 'go' stuff
+#
+
+(
+    go get github.com/jessfraz/apk-file
+    go get github.com/jessfraz/udict
+    go get github.com/crosbymichael/ip-addr
+)
+
+#
+# Install things through pip
+#
+
+sudo -H pip install howdoi
+
