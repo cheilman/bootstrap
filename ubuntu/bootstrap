@@ -197,22 +197,6 @@ if [ $isLaptop -eq 1 ]; then
 fi
 
 #
-# Download and install our shell
-#
-echo "Installing cahhome shell environment."
-cd ~ && git clone --recursive git@bitbucket.org:cheilman/cahhome.git .cahhome
-cd ~/.cahhome/modules && git clone git@bitbucket.org:cheilman/cahhome_atom.git atom
-
-cd ~ && ./.cahhome/install
-
-if [ $isLaptop -eq 1 ]; then
-    #
-    # Install py3status
-    #
-    cd ~/.i3/dev-py3status && sudo pypi-install py3status
-fi
-
-#
 # Switch to zsh
 #
 echo "Changing shell to zsh"
@@ -222,6 +206,20 @@ if [ -n "$zsh_bin" ]; then
 else
 	echo "!!! ZSH NOT INSTALLED !!!"
 fi
+
+#
+# Download and install our shell
+#
+echo "Installing carapace shell environment."
+cd ~ && git clone --recursive git@github.com:cheilman/carapace.git .carapace
+
+if [ $isLaptop -eq 1 ]; then
+    cd ~/.carapace/bundles && git clone git@github.com:cheilman/carapace-laptop.git laptop
+    cd ~/.carapace/bundles && git clone git@github.com:cheilman/carapace-backgrounds.git backgrounds
+fi
+
+cd ~ && PATH=$PATH:~/.carapace/install carapace-install
+
 
 #
 # Do another update and upgrade
