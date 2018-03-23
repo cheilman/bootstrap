@@ -94,7 +94,7 @@ sudo add-apt-repository -y ppa:git-core/ppa
 
 # Docker
 sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-echo "deb https://apt.dockerproject.org/repo ubuntu-`lsb_release -cs` main" | sudo tee /etc/apt/sources.list.d/docker.list
+echo "deb https://apt.dockerproject.org/repo ubuntu-$(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/docker.list
 
 # Asciinema
 sudo apt-add-repository ppa:zanchey/asciinema
@@ -200,7 +200,7 @@ fi
 # Switch to zsh
 #
 echo "Changing shell to zsh"
-zsh_bin=`cat /etc/shells | grep zsh | head -1`
+zsh_bin=$(cat /etc/shells | grep zsh | head -1)
 if [ -n "$zsh_bin" ]; then
 	sudo chsh -s "$zsh_bin" $(whoami)
 else
