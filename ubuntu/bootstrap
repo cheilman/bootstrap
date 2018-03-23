@@ -66,7 +66,7 @@ fi
 
 echo "Here is your public ssh key: "
 cat ~/.ssh/id_rsa.pub
-read -p "Press [ENTER] when key has been uploaded to bitbucket."
+read -p "Press [ENTER] when key has been uploaded to github."
 
 #
 # Then, add a bunch of PPAs
