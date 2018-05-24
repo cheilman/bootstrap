@@ -3,6 +3,8 @@
 # Install all the needed things for our system
 #
 
+set -e
+
 #
 # Figure out if we're doing a server/laptop install, and if we want tex
 #
@@ -54,7 +56,7 @@ fi
 #
 echo "Installing base requirements"
 
-sudo apt-get install -y apt-file aptitude curl git openssh-client vim zsh
+sudo apt-get install -y aptitude curl git openssh-client vim zsh
 
 #
 # Set up our SSH key
@@ -128,16 +130,13 @@ sudo aptitude install -y \
         fortune-mod \
         git \
         git-extras \
-        gpointing-device-settings \
         gtk-chtheme \
         htop \
         inotify-tools \
         inxi \
         locate \
         lynx \
-        openjdk-8-jre \
-        oracle-java8-installer \
-        oracle-java8-set-default \
+        openjdk-8-jdk \
         pandoc \
         python \
         python3 \
@@ -161,6 +160,7 @@ if [ $isLaptop -eq 1 ]; then
             feh \
             gimp \
             google-chrome-stable \
+	    gpointing-device-settings \
             guake \
             ibam \
             lxappearance \
@@ -210,8 +210,11 @@ fi
 #
 # Download and install our shell
 #
-echo "Installing carapace shell environment."
-cd ~ && git clone --recursive git@github.com:cheilman/carapace.git .carapace
+
+if [ ! -d ~/.carapace ]; then
+    echo "Installing carapace shell environment."
+    cd ~ && git clone --recursive git@github.com:cheilman/carapace.git .carapace
+fi
 
 if [ $isLaptop -eq 1 ]; then
     cd ~/.carapace/bundles && git clone git@github.com:cheilman/carapace-laptop.git laptop
@@ -231,42 +234,39 @@ sudo aptitude update && sudo aptitude upgrade
 # Kick off an indexing
 #
 echo "Indexing home directory."
-~/bin/cahhome-update-database
+~/bin/carapace/cahhome-update-database
 
 #
 # Confgure docker service
 #
 NEW_DOCKER_OPTS='--dns 10.43.23.72 --dns 10.43.21.186 --dns 10.4.4.10 --dns 8.8.8.8 --dns 8.8.8.4 --dns-search amazon.com --bip=240.10.10.1/16'
 echo DOCKER_OPTS=\"$NEW_DOCKER_OPTS\" | sudo tee -a /etc/default/docker
-mkdir -p /etc/systemd/system/docker.service.d
+sudo mkdir -p /etc/systemd/system/docker.service.d
 cat << EOF | sudo tee /etc/systemd/system/docker.service.d/amazon-ip.conf
 [Service]
 ExecStart=
 ExecStart=/usr/bin/dockerd -H fd:// $NEW_DOCKER_OPTS
 EOF
-sudo systemctl daemon-reload
+# I don't care much if this works or not (for now)
+sudo systemctl daemon-reload || :
 sudo groupadd docker || :
-sudo usermod -aG docker $USER
-sudo systemctl enable docker
+sudo usermod -aG docker $USER || :
+sudo systemctl enable docker || :
 
 #
 # Start docker service
 # 
-sudo systemctl restart docker
-
-#
-# Install a bunch of 'go' stuff
-#
-
-(
-    go get github.com/jessfraz/apk-file
-    go get github.com/jessfraz/udict
-    go get github.com/crosbymichael/ip-addr
-)
+sudo systemctl restart docker || :
 
 #
 # Install things through pip
 #
 
-sudo -H pip install howdoi
+if which pip 2> /dev/null; then
+    sudo -H pip install --upgrade pip
+    sudo -H pip install howdoi
+elif which pip3 2> /dev/null; then
+    sudo -H pip3 install --upgrade pip
+    sudo -H pip3 install howdoi
+fi
 
