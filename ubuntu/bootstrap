@@ -5,6 +5,8 @@
 
 set -e
 
+umask 022
+
 #
 # Figure out if we're doing a server/laptop install, and if we want tex
 #
