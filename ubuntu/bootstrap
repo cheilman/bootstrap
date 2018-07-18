@@ -136,6 +136,8 @@ sudo aptitude install -y \
         htop \
         inotify-tools \
         inxi \
+        libgit2-24 \
+        libgit2-dev \
         locate \
         lynx \
         openjdk-8-jdk \
