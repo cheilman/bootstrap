@@ -151,12 +151,20 @@ sudo aptitude install -y \
         python-stdeb \
         silversearcher-ag \
         taskwarrior \
+        tree \
         tmux \
         traceroute \
         vim \
         wget \
         xindy \
         zsh
+
+# Some optional packages
+sudo aptitude install -y \
+    golang \
+    ncdu \
+    powerline \
+    || :
 
 if [ $isLaptop -eq 1 ]; then
     echo "Installing laptop-focused packages."
@@ -168,6 +176,7 @@ if [ $isLaptop -eq 1 ]; then
 	    gpointing-device-settings \
             guake \
             ibam \
+            imagemagick \
             lxappearance \
             numlockx \
             qt4-qtconfig \
