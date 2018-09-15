@@ -90,9 +90,6 @@ sudo add-apt-repository -y ppa:ubuntu-wine/ppa
 # Wireshark (just the repo, don't install it yet)
 sudo apt-add-repository ppa:wireshark-dev/stable
 
-# Oracle Java
-sudo add-apt-repository -y ppa:webupd8team/java
-
 # Git
 sudo add-apt-repository -y ppa:git-core/ppa
 
