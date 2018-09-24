@@ -24,7 +24,6 @@ while [[ $# -gt 1 ]]; do
             installTex=1
             ;;
     esac
-    
     shift
 done
 
@@ -58,7 +57,14 @@ fi
 #
 echo "Installing base requirements"
 
-sudo apt-get install -y aptitude curl git openssh-client vim zsh
+sudo apt-get install -y \
+        aptitude \
+        curl \
+        git \
+        openssh-client \
+        software-properties-common \
+        vim \
+        zsh
 
 #
 # Set up our SSH key
@@ -81,27 +87,15 @@ echo "Adding PPAs"
 curl https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
 
-# Atom
-sudo add-apt-repository -y ppa:webupd8team/atom
-
-# Wine
-sudo add-apt-repository -y ppa:ubuntu-wine/ppa
-
-# Wireshark (just the repo, don't install it yet)
-sudo apt-add-repository ppa:wireshark-dev/stable
-
 # Git
 sudo add-apt-repository -y ppa:git-core/ppa
 
 # Docker
-sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-echo "deb https://apt.dockerproject.org/repo ubuntu-$(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/docker.list
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
 # Asciinema
 sudo apt-add-repository ppa:zanchey/asciinema
-
-# TexLive (latex)
-sudo add-apt-repository ppa:jonathonf/texlive-2017
 
 #
 # Do an update and upgrade
@@ -123,8 +117,9 @@ sudo aptitude install -y \
         build-essential \
         bzip2 \
         ca-certificates \
+        cmake \
         datamash \
-        docker-engine \
+        docker-ce \
         entr \
         fortune-mod \
         git \
@@ -133,7 +128,7 @@ sudo aptitude install -y \
         htop \
         inotify-tools \
         inxi \
-        libgit2-24 \
+        libgit2-26 \
         libgit2-dev \
         locate \
         lynx \
@@ -166,11 +161,9 @@ sudo aptitude install -y \
 if [ $isLaptop -eq 1 ]; then
     echo "Installing laptop-focused packages."
     sudo aptitude install -y \
-            atom \
             feh \
             gimp \
             google-chrome-stable \
-	    gpointing-device-settings \
             guake \
             ibam \
             imagemagick \
@@ -178,11 +171,15 @@ if [ $isLaptop -eq 1 ]; then
             numlockx \
             qt4-qtconfig \
             scrot \
-            wine \
             xautolock \
             xbacklight \
             xclip \
             xdot
+
+    echo "Installing vscode"
+    curl -O 'https://go.microsoft.com/fwlink/?LinkID=760868' /tmp/vscode.deb
+    sudo dpkg -i /tmp/vscode.deb
+    sudo apt-get install -f
 
     echo "Attempting to install audio utilities, not a big deal if this fails."
     sudo aptitude install -y pulseaudio-utils || :
@@ -198,9 +195,9 @@ if [ $isLaptop -eq 1 ]; then
     # Some weird stuff to get i3 set up
     #
     echo "Trying to get i3 up and running."
-    sudo sh -c 'echo "deb http://debian.sur5r.net/i3/ $(lsb_release -c -s) universe" >> /etc/apt/sources.list.d/i3.list'
-    sudo apt-get update
-    sudo apt-get --allow-unauthenticated install sur5r-keyring
+    /usr/lib/apt/apt-helper download-file http://debian.sur5r.net/i3/pool/main/s/sur5r-keyring/sur5r-keyring_2018.01.30_all.deb /tmp/i3-keyring.deb SHA256:baa43dbbd7232ea2b5444cae238d53bebb9d34601cc000e82f11111b1889078a
+    sudo dpkg -i /tmp/i3-keyring.deb
+    sudo sh -c 'echo "deb http://debian.sur5r.net/i3/ $(grep '^DISTRIB_CODENAME=' /etc/lsb-release | cut -f2 -d=) universe" >> /etc/apt/sources.list.d/sur5r-i3.list'
     sudo apt-get update
     sudo apt-get install -y \
             i3 \
@@ -266,7 +263,7 @@ sudo systemctl enable docker || :
 
 #
 # Start docker service
-# 
+#
 sudo systemctl restart docker || :
 
 #
