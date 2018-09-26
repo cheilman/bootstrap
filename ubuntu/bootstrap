@@ -126,12 +126,14 @@ sudo aptitude install -y \
         git-extras \
         gtk-chtheme \
         htop \
+        httpie \
         inotify-tools \
         inxi \
         libgit2-26 \
         libgit2-dev \
         locate \
         lynx \
+        mycli \
         openjdk-8-jdk \
         pandoc \
         pv \
